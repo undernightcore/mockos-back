@@ -3,6 +3,7 @@ import RegisterValidator from 'App/Validators/RegisterValidator'
 import User from 'App/Models/User'
 import Mail from '@ioc:Adonis/Addons/Mail'
 import Route from '@ioc:Adonis/Core/Route'
+import LoginValidator from 'App/Validators/LoginValidator'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -28,5 +29,18 @@ export default class AuthController {
     user.verified = true
     await user.save()
     return response.redirect('https://google.es')
+  }
+
+  public async login({ request, response, auth }: HttpContextContract) {
+    const data = await request.validate(LoginValidator)
+    try {
+      const token = await auth.attempt(data.email, data.password)
+      const user = await User.findBy('email', data.email)
+      return user?.verified
+        ? response.ok(token)
+        : response.forbidden({ message: 'Tienes que verificar tu correo electrónico primero' })
+    } catch {
+      return response.unauthorized({ message: 'Bro estas credenciales no están bien.' })
+    }
   }
 }
