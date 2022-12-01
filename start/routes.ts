@@ -19,3 +19,4 @@
 */
 
 import './routes/auth'
+import './routes/projects'
