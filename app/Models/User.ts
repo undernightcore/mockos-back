@@ -1,7 +1,16 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { column, beforeSave, BaseModel, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  column,
+  beforeSave,
+  BaseModel,
+  manyToMany,
+  ManyToMany,
+  hasMany,
+  HasMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import Project from 'App/Models/Project'
+import Member from 'App/Models/Member'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -15,6 +24,9 @@ export default class User extends BaseModel {
 
   @column()
   public verified: boolean
+
+  @hasMany(() => Member)
+  public invitations: HasMany<typeof Member>
 
   @manyToMany(() => Project, {
     pivotTable: 'members',

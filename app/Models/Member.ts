@@ -1,9 +1,12 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import Project from 'App/Models/Project'
 
 export default class Member extends BaseModel {
   @column({ isPrimary: true })
   public id: number
+
+  @belongsTo(() => Project)
+  public project: BelongsTo<typeof Project>
 
   @column({ serializeAs: null })
   public projectId: number
@@ -13,10 +16,4 @@ export default class Member extends BaseModel {
 
   @column()
   public verified: boolean
-
-  @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
 }

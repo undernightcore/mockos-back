@@ -2,13 +2,14 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import CreatePostValidator from 'App/Validators/CreatePostValidator'
 import Project from 'App/Models/Project'
 import EditPostValidator from 'App/Validators/EditPostValidator'
+import User from 'App/Models/User'
 
 export default class ProjectsController {
   public async create({ request, response, auth }: HttpContextContract) {
     const user = await auth.authenticate()
     const data = await request.validate(CreatePostValidator)
     const project = await Project.create(data)
-    await project.related('members').create(user, { verified: true })
+    await project.related('members').attach({ [user.id]: { verified: true } })
     return response.created(project)
   }
 
@@ -45,5 +46,20 @@ export default class ProjectsController {
       .query()
       .paginate(page ?? 1, perPage ?? 10)
     return response.ok(projectList)
+  }
+
+  public async invite({ response, params, auth, bouncer }: HttpContextContract) {
+    await auth.authenticate()
+    const project = await Project.findOrFail(params.projectId)
+    const user = await User.findOrFail(params.userId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.forUser(user).with('ProjectPolicy').authorize('isAlreadyMember', project)
+    await bouncer.forUser(user).with('GlobalPolicy').authorize('isVerified')
+    await project.related('members').attach({
+      [user.id]: {
+        verified: false,
+      },
+    })
+    return response.ok({ message: 'User has been invited' })
   }
 }

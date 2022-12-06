@@ -6,6 +6,7 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
+      table.unique(['project_id', 'user_id'])
       table
         .integer('project_id')
         .unsigned()
@@ -14,8 +15,6 @@ export default class extends BaseSchema {
         .onDelete('CASCADE')
       table.integer('user_id').unsigned().notNullable().references('users.id').onDelete('CASCADE')
       table.boolean('verified').defaultTo(false)
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
     })
   }
 
