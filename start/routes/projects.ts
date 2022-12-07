@@ -6,5 +6,5 @@ Route.group(() => {
   Route.delete(':id', 'ProjectsController.delete')
   Route.put(':id', 'ProjectsController.edit')
   Route.get(':id', 'ProjectsController.get')
-  Route.post(':projectId/member/:userId', 'MembersController.invite')
+  Route.post(':projectId/member/:userId', 'ProjectsController.invite')
 }).prefix('project')

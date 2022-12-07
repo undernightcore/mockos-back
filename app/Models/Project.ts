@@ -9,6 +9,9 @@ export default class Project extends BaseModel {
   @column()
   public name: string
 
+  @column()
+  public description: string | null
+
   @manyToMany(() => User, {
     pivotTable: 'members',
   })
