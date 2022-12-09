@@ -1,5 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Member from 'App/Models/Member'
+import Project from 'App/Models/Project'
+import User from 'App/Models/User'
 
 export default class InvitationsController {
   public async getList({ request, response, auth }: HttpContextContract) {
@@ -23,5 +25,20 @@ export default class InvitationsController {
     invitation.verified = true
     await invitation.save()
     return response.ok({ message: `Bienvenido a ${invitation.project.name}, ${user.name}!` })
+  }
+
+  public async invite({ response, params, auth, bouncer }: HttpContextContract) {
+    await auth.authenticate()
+    const project = await Project.findOrFail(params.projectId)
+    const user = await User.findOrFail(params.userId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project)
+    await bouncer.forUser(user).with('ProjectPolicy').authorize('isAlreadyMember', project)
+    await bouncer.forUser(user).with('GlobalPolicy').authorize('isVerified')
+    await project.related('members').attach({
+      [user.id]: {
+        verified: false,
+      },
+    })
+    return response.ok({ message: 'User has been invited' })
   }
 }

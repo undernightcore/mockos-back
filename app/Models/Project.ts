@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
+import Route from 'App/Models/Route'
 
 export default class Project extends BaseModel {
   @column({ isPrimary: true })
@@ -11,6 +12,9 @@ export default class Project extends BaseModel {
 
   @column()
   public description: string | null
+
+  @hasMany(() => Route)
+  public routes: HasMany<typeof Route>
 
   @manyToMany(() => User, {
     pivotTable: 'members',

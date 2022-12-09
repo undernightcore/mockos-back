@@ -18,6 +18,7 @@
 |
 */
 
+import './routes/routes'
 import './routes/invitations'
 import './routes/auth'
 import './routes/projects'
