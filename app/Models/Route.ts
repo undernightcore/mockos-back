@@ -19,6 +19,9 @@ export default class Route extends BaseModel {
   @column()
   public enabled: boolean
 
+  @column({ serializeAs: null })
+  public order: number
+
   @belongsTo(() => Project)
   public project: BelongsTo<typeof Project>
 

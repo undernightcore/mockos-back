@@ -1,12 +1,12 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import CreatePostValidator from 'App/Validators/CreatePostValidator'
 import Project from 'App/Models/Project'
-import EditPostValidator from 'App/Validators/EditPostValidator'
+import EditProjectValidator from 'App/Validators/Project/EditProjectValidator'
+import CreateProjectValidator from 'App/Validators/Project/CreateProjectValidator'
 
 export default class ProjectsController {
   public async create({ request, response, auth }: HttpContextContract) {
     const user = await auth.authenticate()
-    const data = await request.validate(CreatePostValidator)
+    const data = await request.validate(CreateProjectValidator)
     const project = await Project.create(data)
     await project.related('members').attach({ [user.id]: { verified: true } })
     return response.created(project)
@@ -22,7 +22,7 @@ export default class ProjectsController {
 
   public async edit({ request, params, response, auth, bouncer }: HttpContextContract) {
     await auth.authenticate()
-    const data = await request.validate(EditPostValidator)
+    const data = await request.validate(EditProjectValidator)
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     const newProject = await project?.merge(data).save()

@@ -1,13 +1,10 @@
 import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class EditRouteValidator {
-  constructor(protected ctx: HttpContextContract) {}
-
+export default class CreateRouteValidator {
   public schema = schema.create({
     name: schema.string({}, [rules.minLength(3)]),
     method: schema.enum(['get', 'post', 'put', 'delete', 'patch']),
-    endpoint: schema.string(),
+    endpoint: schema.string({}, [rules.regex(new RegExp('^\\/([^/]*[^/]|)$'))]),
     enabled: schema.boolean(),
   })
 
@@ -17,6 +14,7 @@ export default class EditRouteValidator {
     'method.required': 'Es necesario especificar un verbo HTTP',
     'method.enum': 'No es un verbo válido.',
     'endpoint.required': 'Es necesaria la URL del endpoint a crear',
+    'endpoint.regex': 'El endpoint debe comenzar con / y no terminar en /',
     'enabled.required': 'Tienes que indicar el estado de la ruta',
   }
 }

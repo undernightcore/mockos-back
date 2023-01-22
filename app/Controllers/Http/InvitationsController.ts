@@ -39,6 +39,6 @@ export default class InvitationsController {
         verified: false,
       },
     })
-    return response.ok({ message: 'User has been invited' })
+    return response.ok({ message: `Se ha invitado a ${user.name}` })
   }
 }

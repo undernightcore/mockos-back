@@ -1,7 +1,7 @@
 import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class EditPostValidator {
+export default class EditProjectValidator {
   constructor(protected ctx: HttpContextContract) {}
 
   public schema = schema.create({
