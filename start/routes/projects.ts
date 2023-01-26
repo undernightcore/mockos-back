@@ -9,4 +9,5 @@ Route.group(() => {
   Route.post(':projectId/member/:userId', 'InvitationsController.invite')
   Route.post(':id/route', 'RoutesController.create')
   Route.get(':id/route', 'RoutesController.getList')
+  Route.post(':id/sort', 'RoutesController.sort')
 }).prefix('project')

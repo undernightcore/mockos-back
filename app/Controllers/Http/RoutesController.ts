@@ -13,7 +13,7 @@ export default class RoutesController {
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     const data = await request.validate(CreateRouteValidator)
-    const lastOrder = await project.related('routes').query().orderBy('order').first()
+    const lastOrder = await project.related('routes').query().orderBy('order', 'desc').first()
     const route = await project
       .related('routes')
       .create({ ...data, order: (lastOrder?.order ?? 0) + 1 })
@@ -71,13 +71,16 @@ export default class RoutesController {
     move(routes, fromIndex, toIndex)
     await Database.transaction(async (trx) => {
       await Promise.all(
-        routes.map((route, index) => {
+        routes.map(async (route, index) => {
           route.useTransaction(trx)
+          route.order = index + routes.length + 1
+          await route.save()
           route.order = index + 1
-          return route.save()
+          await route.save()
         })
       )
+      await trx.commit()
     })
-    return response.ok({ message: 'Esto no funciona ni de coña' })
+    return response.ok({ message: 'Se ha movido correctamente' })
   }
 }

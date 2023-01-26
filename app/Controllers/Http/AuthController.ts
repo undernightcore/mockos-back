@@ -1,9 +1,9 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import RegisterValidator from 'App/Validators/RegisterValidator'
 import User from 'App/Models/User'
 import Mail from '@ioc:Adonis/Addons/Mail'
 import Route from '@ioc:Adonis/Core/Route'
-import LoginValidator from 'App/Validators/LoginValidator'
+import RegisterValidator from 'App/Validators/Auth/RegisterValidator'
+import LoginValidator from 'App/Validators/Auth/LoginValidator'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -14,7 +14,7 @@ export default class AuthController {
     })
     await Mail.send((message) => {
       message
-        .from('mockos@puntaserver.com')
+        .from('admin@puntaserver.com')
         .to(user.email)
         .subject('¡Bienvenido a Mockos!')
         .text(`Porfi, verifica tu correo aquí http://localhost:3333${verificationUrl}`)
