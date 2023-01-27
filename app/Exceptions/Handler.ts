@@ -7,10 +7,11 @@ export default class ExceptionHandler extends HttpExceptionHandler {
     super(Logger)
   }
   public async handle(error: any, ctx: HttpContextContract) {
-    return ctx.response.status(error.status ?? 500).send({
-      errors: error.messages?.errors?.map((e) => e.message) ?? [error.message] ?? [
-          'Ha habido un error',
-        ],
+    const code = error.status ?? 500
+    const messages = error.messages?.errors?.map((e) => e.message) ?? [error.message]
+    Logger.info(error)
+    return ctx.response.status(code).send({
+      errors: code === 500 || !messages ? 'Error inesperado' : messages,
     })
   }
 }
