@@ -15,7 +15,7 @@ export default class AuthController {
     })
     await Mail.send((message) => {
       message
-        .from(Env.get('SMTP_HOST'))
+        .from(Env.get('SMTP_USERNAME'))
         .to(user.email)
         .subject('¡Bienvenido a Mockos!')
         .text(`Porfi, verifica tu correo aquí ${Env.get('BACK_URL')}${verificationUrl}`)
