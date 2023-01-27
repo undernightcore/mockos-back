@@ -4,6 +4,7 @@ import Mail from '@ioc:Adonis/Addons/Mail'
 import Route from '@ioc:Adonis/Core/Route'
 import RegisterValidator from 'App/Validators/Auth/RegisterValidator'
 import LoginValidator from 'App/Validators/Auth/LoginValidator'
+import Env from '@ioc:Adonis/Core/Env'
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {
@@ -14,10 +15,15 @@ export default class AuthController {
     })
     await Mail.send((message) => {
       message
-        .from('admin@puntaserver.com')
+        .from(Env.get('SMTP_HOST', 'admin@puntaserver.com'))
         .to(user.email)
         .subject('¡Bienvenido a Mockos!')
-        .text(`Porfi, verifica tu correo aquí http://localhost:3333${verificationUrl}`)
+        .text(
+          `Porfi, verifica tu correo aquí ${Env.get(
+            'BACK_URL',
+            'http://localhost:3333'
+          )}${verificationUrl}`
+        )
     })
     return response.created({ message: `Holi ${user.name}, verifica tu correo electrónico porfa` })
   }
