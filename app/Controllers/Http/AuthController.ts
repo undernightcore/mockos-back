@@ -15,15 +15,10 @@ export default class AuthController {
     })
     await Mail.send((message) => {
       message
-        .from(Env.get('SMTP_HOST', 'admin@puntaserver.com'))
+        .from(Env.get('SMTP_HOST'))
         .to(user.email)
         .subject('¡Bienvenido a Mockos!')
-        .text(
-          `Porfi, verifica tu correo aquí ${Env.get(
-            'BACK_URL',
-            'http://localhost:3333'
-          )}${verificationUrl}`
-        )
+        .text(`Porfi, verifica tu correo aquí ${Env.get('BACK_URL')}${verificationUrl}`)
     })
     return response.created({ message: `Holi ${user.name}, verifica tu correo electrónico porfa` })
   }
