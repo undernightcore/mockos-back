@@ -24,12 +24,12 @@ export default class AuthController {
   }
 
   public async verify({ request, response, params }: HttpContextContract) {
-    if (!request.hasValidSignature()) return response.redirect('https://bing.es')
+    if (!request.hasValidSignature()) return response.redirect(Env.get('VERIFY_FAILURE_URL'))
     const user = await User.findBy('email', params.email)
-    if (!user) return response.redirect('https://bing.es')
+    if (!user) return response.redirect(Env.get('VERIFY_FAILURE_URL'))
     user.verified = true
     await user.save()
-    return response.redirect('https://google.es')
+    return response.redirect(Env.get('VERIFY_SUCCESS_URL'))
   }
 
   public async login({ request, response, auth }: HttpContextContract) {
