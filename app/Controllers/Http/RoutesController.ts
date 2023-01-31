@@ -6,6 +6,7 @@ import EditRouteValidator from 'App/Validators/Route/EditRouteValidator'
 import SortRouteValidator from 'App/Validators/Route/SortRouteValidator'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { move } from 'App/Helpers/array.helper'
+import { recalculateRouteOrder } from 'App/Helpers/sort.helper'
 
 export default class RoutesController {
   public async create({ request, response, auth, params, bouncer }: HttpContextContract) {
@@ -39,19 +40,8 @@ export default class RoutesController {
       await route.useTransaction(trx)
       await route.delete()
       const routes = await route.project.related('routes').query()
-      await Promise.all(
-        routes.map(async (r, index) => {
-          r.useTransaction(trx)
-          r.order = index + routes.length + 1
-          await r.save()
-        })
-      )
-      await Promise.all(
-        routes.map(async (r, index) => {
-          r.order = index + 1
-          await r.save()
-        })
-      )
+      await recalculateRouteOrder(routes, trx)
+      await trx.commit()
     })
     return response.ok({ message: 'Se ha eliminado la ruta correctamente' })
   }
@@ -96,19 +86,7 @@ export default class RoutesController {
     const toIndex = routes.findIndex((route) => route.id === toRoute.id)
     move(routes, fromIndex, toIndex)
     await Database.transaction(async (trx) => {
-      await Promise.all(
-        routes.map(async (route, index) => {
-          route.useTransaction(trx)
-          route.order = index + routes.length + 1
-          await route.save()
-        })
-      )
-      await Promise.all(
-        routes.map(async (route, index) => {
-          route.order = index + 1
-          await route.save()
-        })
-      )
+      await recalculateRouteOrder(routes, trx)
       await trx.commit()
     })
     return response.ok({ message: 'Se ha movido correctamente' })
