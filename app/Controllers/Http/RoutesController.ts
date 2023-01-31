@@ -30,6 +30,32 @@ export default class RoutesController {
     return response.ok(newRoute)
   }
 
+  public async delete({ response, auth, params, bouncer }: HttpContextContract) {
+    await auth.authenticate()
+    const route = await Route.findOrFail(params.id)
+    await route.load('project')
+    await bouncer.with('ProjectPolicy').authorize('isMember', route.project)
+    await Database.transaction(async (trx) => {
+      await route.useTransaction(trx)
+      await route.delete()
+      const routes = await route.project.related('routes').query()
+      await Promise.all(
+        routes.map(async (r, index) => {
+          r.useTransaction(trx)
+          r.order = index + routes.length + 1
+          await r.save()
+        })
+      )
+      await Promise.all(
+        routes.map(async (r, index) => {
+          r.order = index + 1
+          await r.save()
+        })
+      )
+    })
+    return response.ok({ message: 'Se ha eliminado la ruta correctamente' })
+  }
+
   public async get({ response, auth, params, bouncer }: HttpContextContract) {
     await auth.authenticate()
     const route = await Route.findOrFail(params.id)
@@ -75,6 +101,10 @@ export default class RoutesController {
           route.useTransaction(trx)
           route.order = index + routes.length + 1
           await route.save()
+        })
+      )
+      await Promise.all(
+        routes.map(async (route, index) => {
           route.order = index + 1
           await route.save()
         })
