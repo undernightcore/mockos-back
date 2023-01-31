@@ -11,6 +11,6 @@ WORKDIR /usr/local/app
 COPY --from=build /usr/local/app/build/ /usr/local/app/
 ENV NODE_ENV=production
 RUN npm ci
-RUN node ace migration:run --force
+RUN node ace migration:fresh --force
 CMD [ "node", "server.js" ]
 EXPOSE 3333

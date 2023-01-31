@@ -23,9 +23,10 @@ export default class RoutesController {
 
   public async edit({ request, response, auth, params, bouncer }: HttpContextContract) {
     await auth.authenticate()
-    const data = await request.validate(EditRouteValidator)
     const route = await Route.findOrFail(params.id)
     const project = await Project.findOrFail(route.projectId)
+    params.projectId = route.projectId
+    const data = await request.validate(EditRouteValidator)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     const newRoute = await route.merge(data).save()
     return response.ok(newRoute)
@@ -34,12 +35,12 @@ export default class RoutesController {
   public async delete({ response, auth, params, bouncer }: HttpContextContract) {
     await auth.authenticate()
     const route = await Route.findOrFail(params.id)
-    await route.load('project')
-    await bouncer.with('ProjectPolicy').authorize('isMember', route.project)
+    const project = await Project.findOrFail(route.projectId)
+    await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await Database.transaction(async (trx) => {
       await route.useTransaction(trx)
       await route.delete()
-      const routes = await route.project.related('routes').query()
+      const routes = await project.related('routes').query()
       await recalculateRouteOrder(routes, trx)
       await trx.commit()
     })

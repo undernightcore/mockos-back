@@ -13,6 +13,9 @@ export default class Response extends BaseModel {
   public body: string
 
   @column()
+  public name: string
+
+  @column()
   public enabled: boolean
 
   @belongsTo(() => Route)
