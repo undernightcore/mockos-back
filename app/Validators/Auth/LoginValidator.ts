@@ -8,6 +8,7 @@ export default class LoginValidator {
 
   public messages: CustomMessages = {
     'email.required': 'Necesito tu correo para poder logearte.',
+    'email.email': 'Este correo no es valido.',
     'password.required': 'Necesito tu contraseña (o tu intento de contreseña).',
   }
 }
