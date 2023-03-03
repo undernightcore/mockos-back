@@ -39,9 +39,9 @@ export default class AuthController {
       const user = await User.findBy('email', data.email)
       return user?.verified
         ? response.ok(token)
-        : response.forbidden({ message: 'Tienes que verificar tu correo electrónico primero' })
+        : response.forbidden({ errors: ['Tienes que verificar tu correo electrónico primero'] })
     } catch {
-      return response.unauthorized({ message: 'Bro estas credenciales no están bien.' })
+      return response.unauthorized({ errors: ['Bro estas credenciales no están bien.'] })
     }
   }
 }
