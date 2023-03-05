@@ -17,7 +17,7 @@ export default class ProjectsController {
     const project = await Project.findOrFail(params.id)
     await bouncer.with('ProjectPolicy').authorize('isMember', project)
     await project.delete()
-    return response.ok(project)
+    return response.ok({ message: `Se ha eliminado el projecto ${project.name} correctamente` })
   }
 
   public async edit({ request, params, response, auth, bouncer }: HttpContextContract) {
