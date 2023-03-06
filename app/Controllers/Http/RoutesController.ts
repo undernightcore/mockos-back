@@ -82,7 +82,7 @@ export default class RoutesController {
       return response
         .status(400)
         .json({ errors: ['Las rutas no corresponden al projecto correcto'] })
-    const routes = await project.related('routes').query()
+    const routes = await project.related('routes').query().orderBy('order')
     const fromIndex = routes.findIndex((route) => route.id === fromRoute.id)
     const toIndex = routes.findIndex((route) => route.id === toRoute.id)
     move(routes, fromIndex, toIndex)
