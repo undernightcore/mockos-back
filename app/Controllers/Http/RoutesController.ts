@@ -40,7 +40,7 @@ export default class RoutesController {
     await Database.transaction(async (trx) => {
       await route.useTransaction(trx)
       await route.delete()
-      const routes = await project.related('routes').query()
+      const routes = await project.related('routes').query().useTransaction(trx)
       await recalculateRouteOrder(routes, trx)
       await trx.commit()
     })
@@ -65,6 +65,7 @@ export default class RoutesController {
     const routes = await project
       .related('routes')
       .query()
+      .orderBy('order')
       .whereILike('name', `%${search ?? ''}%`)
       .orWhereILike('endpoint', `%${search ?? ''}%`)
       .paginate(page ?? 1, perPage ?? 10)
@@ -82,11 +83,11 @@ export default class RoutesController {
       return response
         .status(400)
         .json({ errors: ['Las rutas no corresponden al projecto correcto'] })
-    const routes = await project.related('routes').query().orderBy('order')
-    const fromIndex = routes.findIndex((route) => route.id === fromRoute.id)
-    const toIndex = routes.findIndex((route) => route.id === toRoute.id)
-    move(routes, fromIndex, toIndex)
     await Database.transaction(async (trx) => {
+      const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
+      const fromIndex = routes.findIndex((route) => route.id === fromRoute.id)
+      const toIndex = routes.findIndex((route) => route.id === toRoute.id)
+      move(routes, fromIndex, toIndex)
       await recalculateRouteOrder(routes, trx)
       await trx.commit()
     })
