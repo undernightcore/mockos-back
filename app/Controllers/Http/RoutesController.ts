@@ -40,7 +40,7 @@ export default class RoutesController {
     await Database.transaction(async (trx) => {
       await route.useTransaction(trx)
       await route.delete()
-      const routes = await project.related('routes').query().orderBy('order').useTransaction(trx)
+      const routes = await project.related('routes').query().useTransaction(trx).orderBy('order')
       await recalculateRouteOrder(routes, trx)
       await trx.commit()
     })

@@ -1,16 +1,20 @@
 import { TransactionClientContract } from '@ioc:Adonis/Lucid/Database'
 import Route from 'App/Models/Route'
 
-export async function recalculateRouteOrder(routes: Route[], trx: TransactionClientContract) {
+export async function recalculateRouteOrder(sortedRoutes: Route[], trx: TransactionClientContract) {
+  const lastRouteOrder = sortedRoutes.reduce(
+    (acc, value) => (value.order > acc ? value.order : acc),
+    1
+  )
   await Promise.all(
-    routes.map(async (r, index) => {
+    sortedRoutes.map(async (r, index) => {
       r.useTransaction(trx)
-      r.order = index + routes.length + 1
+      r.order = index + lastRouteOrder + 1
       await r.save()
     })
   )
   await Promise.all(
-    routes.map(async (r, index) => {
+    sortedRoutes.map(async (r, index) => {
       r.order = index + 1
       await r.save()
     })
