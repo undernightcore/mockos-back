@@ -11,7 +11,7 @@ export default class ExceptionHandler extends HttpExceptionHandler {
     const messages = error.messages?.errors?.map((e) => e.message) ?? [error.message]
     Logger.info(error)
     return ctx.response.status(code).send({
-      errors: code === 500 || !messages ? 'Error inesperado' : messages,
+      errors: code === 500 || !messages ? ['Error inesperado'] : messages,
     })
   }
 }
